@@ -2,10 +2,3 @@ name = "klangkrabueang-md-worker"
 main = "src/index.js"
 compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
-
-[placement]
-mode = "smart"
-
-[[rules]]
-type = "ESModule"
-glob = "**/*.js"
