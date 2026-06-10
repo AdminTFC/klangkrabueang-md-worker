@@ -7,6 +7,8 @@ const turndown = new TurndownService({
   bulletListMarker: '-',
 });
 
+const ORIGIN_HOST = 'xn--12cfjb8g6bl2ezag5e8e9e.com';
+
 export default {
   async fetch(request) {
     const accept = request.headers.get('Accept') || '';
@@ -15,9 +17,21 @@ export default {
       return fetch(request);
     }
 
-    const response = await fetch(request);
-    const contentType = response.headers.get('Content-Type') || '';
+    const url = new URL(request.url);
+    const originUrl = `${url.protocol}//${ORIGIN_HOST}${url.pathname}${url.search}`;
+    const originReq = new Request(originUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
+      redirect: 'follow',
+    });
+    originReq.headers.set('Accept', 'text/html');
 
+    const response = await fetch(originReq, {
+      cf: { resolveOverride: ORIGIN_HOST },
+    });
+
+    const contentType = response.headers.get('Content-Type') || '';
     if (!contentType.includes('text/html')) {
       return response;
     }
