@@ -2,3 +2,7 @@ name = "klangkrabueang-md-worker"
 main = "src/index.js"
 compatibility_date = "2026-06-01"
 compatibility_flags = ["nodejs_compat"]
+
+[observability]
+logs = { enabled = true, invocation_logs = true }
+traces = {}
