@@ -2,27 +2,46 @@ import { parseHTML } from 'linkedom';
 
 const BLOCK = new Set(['div','section','article','main','header','footer','nav','aside','p','h1','h2','h3','h4','h5','h6','ul','ol','li','blockquote','pre','table','hr','br','form','figure','figcaption','details','summary']);
 const SKIP = new Set(['script','style','noscript','svg','canvas','template']);
+const STATIC_EXT = /\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|mp4|webm|pdf|zip|gz|avif)(\?|$)/i;
 
 export default {
-  async fetch(request) {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    if (STATIC_EXT.test(url.pathname)) return fetch(request);
+
+    const dest = request.headers.get('Sec-Fetch-Dest');
+    if (dest && dest !== 'document' && dest !== 'iframe' && dest !== 'nested-document') return fetch(request);
+
     const accept = request.headers.get('Accept') || '';
     if (!accept.includes('text/markdown')) return fetch(request);
+
+    const cacheUrl = new URL(url.toString());
+    cacheUrl.searchParams.set('_fmt', 'markdown');
+    const cacheKey = new Request(cacheUrl.toString());
+    const cached = await caches.default.match(cacheKey);
+    if (cached) return cached;
 
     const response = await fetch(request);
     const ct = (response.headers.get('Content-Type') || '');
     if (!ct.includes('text/html')) return response;
 
     const html = await response.text();
+    if (html.length > 2_000_000) return response;
+
     const { document } = parseHTML(html);
     const markdown = convert(document.body);
 
-    return new Response(markdown, {
+    const result = new Response(markdown, {
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
         'x-markdown-tokens': String(Math.round(markdown.length / 4)),
         'x-original-tokens': String(Math.round(html.length / 4)),
       },
     });
+
+    ctx.waitUntil(caches.default.put(cacheKey, result.clone()));
+    return result;
   },
 };
 
