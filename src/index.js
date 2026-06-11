@@ -1,6 +1,7 @@
 import { parseHTML } from 'linkedom';
 
 const BLOCK = new Set(['div','section','article','main','header','footer','nav','aside','p','h1','h2','h3','h4','h5','h6','ul','ol','li','blockquote','pre','table','hr','br','form','figure','figcaption','details','summary']);
+const SKIP = new Set(['script','style','noscript','svg','canvas','template']);
 
 export default {
   async fetch(request) {
@@ -43,6 +44,7 @@ function convert(node, depth = 0) {
 
 function tag(el, depth) {
   const t = el.tagName.toLowerCase();
+  if (SKIP.has(t)) return '';
   const text = el.textContent.replace(/\s+/g, ' ').trim();
   if (!text && !['br','hr','img'].includes(t)) return '';
 
