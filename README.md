@@ -2,7 +2,7 @@
 
 A Cloudflare Worker that serves HTML-to-Markdown conversion for AI agents visiting [คลังกระเบื้อง.com](https://xn--12cfjb8g6bl2ezag5e8e9e.com/).
 
-Implements **Markdown for Agents** (`Accept: text/markdown` → `Content-Type: text/markdown`) on Cloudflare's Free plan, since the native feature requires a paid plan.
+Implements **Markdown for Agents** (`Accept: text/markdown` → `Content-Type: text/markdown`) on Cloudflare's Free plan.
 
 ## How it works
 
@@ -18,7 +18,7 @@ Implements **Markdown for Agents** (`Accept: text/markdown` → `Content-Type: t
 
 - **Static asset bypass** — regex match on URL extensions skips CSS/JS/images/fonts before any header processing
 - **`Sec-Fetch-Dest` filter** — browser subresource requests (`style`, `image`, `script`, etc.) are dropped immediately
-- **Markdown response caching** — converted output cached with distinct query param (`?_fmt=markdown`)
+- **Markdown response caching** — converted output cached with distinct query param (`?format=markdown`)
 - **HTML size limit** — pages over 2MB are returned as-is to prevent OOM
 - **Zero overhead for normal users** — only requests with `Accept: text/markdown` trigger conversion
 
@@ -50,12 +50,12 @@ git commit -m "description"
 git push
 ```
 
-> **Note:** The dashboard editor (manual pasting) requires pre-bundled code and is NOT recommended. Git integration runs the full build pipeline (`wrangler deploy`).
+> **Note:** The dashboard editor (manual pasting) requires pre-bundled code and is NOT recommended. 
 
 ## Route
 
-The Route `xn--12cfjb8g6bl2ezag5e8e9e.com/*` is configured at the Cloudflare Dashboard level (Workers → Triggers → Routes), not in `wrangler.toml`.
+The Route `xn--12cfjb8g6bl2ezag5e8e9e.com/*` is configured at the Cloudflare Dashboard level (Compute → Workers & Pages → klangkrabueang-md-worker → Domains → Add Domain → Route pattern), not in `wrangler.toml`.
 
 ## Status
 
-> **Note:** The Route sometime was temporarily removed to avoid exceeding the free Workers 100k requests/day quota. Only re-enable on new early day or with a Workers Paid ($5/mo) plan.
+> **Note:** The Route was temporarily removed to avoid exceeding the free Workers 100k requests/day quota. Only re-enable on new early day or with a Workers Paid ($5/mo) plan. currently using this like script via code snippets directly in the website.
