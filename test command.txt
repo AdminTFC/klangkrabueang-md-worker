@@ -1,1 +1,3 @@
 curl -H "Accept: text/markdown" https://xn--12cfjb8g6bl2ezag5e8e9e.com/
+
+curl.exe -s -H "Accept: text/markdown" -w "%{content_type}" "https://xn--12cfjb8g6bl2ezag5e8e9e.com/"
